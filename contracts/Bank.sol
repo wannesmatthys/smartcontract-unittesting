@@ -1,9 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract Wallet {
+import "./BankMetadata.sol";
+
+contract Bank is BankMetadata {
 
     mapping(address => uint256) _balances;
+
+    constructor() BankMetadata("MyCryptoBank") {
+
+    }
 
     function sendMoney(address _to, uint256 _amount) external {
         require(_balances[msg.sender] >= _amount, "ERROR: You do not have this much ether!");
