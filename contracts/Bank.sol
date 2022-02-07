@@ -9,6 +9,8 @@ contract Bank is BankMetadata {
 
     mapping(address => uint256) _balances;
 
+    uint256 private _totalSupply;
+
     constructor() BankMetadata("MyCryptoBank") {
 
     }
@@ -24,11 +26,16 @@ contract Bank is BankMetadata {
 
     receive() payable external {
         _balances[msg.sender] += msg.value;
+        _totalSupply += msg.value;
     }
 
     function getBalance(address _from) external view returns(uint256) {
         require(_from != address(0), "ERROR: Invalid address");
         return _balances[_from];
+    }
+
+    function totalSupply() external view returns(uint256) {
+        return _totalSupply;
     }
 
 }
