@@ -5,6 +5,8 @@ import "./BankMetadata.sol";
 
 contract Bank is BankMetadata {
 
+    event Transfer(address indexed _from, address indexed _to, uint256 indexed _amount);
+
     mapping(address => uint256) _balances;
 
     constructor() BankMetadata("MyCryptoBank") {
@@ -16,6 +18,8 @@ contract Bank is BankMetadata {
 
         _balances[msg.sender] -= _amount;
         _balances[_to] += _amount; 
+
+        emit Transfer(msg.sender, _to, _amount);
     }
 
     receive() payable external {
