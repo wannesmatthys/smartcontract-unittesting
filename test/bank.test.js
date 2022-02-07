@@ -1,8 +1,7 @@
 const {assert} = require('chai');
+const truffleAssertions = require('truffle-assertions');
 
 const Bank = artifacts.require('./Bank');
-
-require('chai').use(require('chai-as-promised')).should();
 
 contract('Bank', (accounts) => {
     let contract;
@@ -21,8 +20,39 @@ contract('Bank', (accounts) => {
         });
 
         it('has a name', async() => {
-            const name = await contract.name()
-            assert.equal(name, 'MyCryptoBank')
+            const name = await contract.name();
+            assert.equal(name, 'MyCryptoBank');
+        });
+    });
+
+    describe('transactions', async () => {
+        it('deposits succesfully', async () => {
+            const amount = 1000;
+
+            await contract.send(amount); // the receive payable
+
+            const totalSupply = await contract.totalSupply();
+            const balance = await contract.getBalance(accounts[0]);
+
+            assert.equal(totalSupply, amount);
+            assert.equal(balance, amount);
+        });
+
+        it('sends money successfully', async () => {
+            // still has money from prev test
+            
+            const result = await contract.sendMoney(accounts[1], 499);
+            truffleAssertions.eventEmitted(result, 'Transfer');
+
+            const balanceAccountOne = await contract.getBalance(accounts[0]);
+            const balanceAccountTwo = await contract.getBalance(accounts[1]);
+
+            assert.equal(balanceAccountOne, 501);
+            assert.equal(balanceAccountTwo, 499);
+        });
+
+        it('sends money but hasn\'t enough', async () => {
+            truffleAssertions.reverts(contract.sendMoney(accounts[1], 5000));
         });
     });
 });
